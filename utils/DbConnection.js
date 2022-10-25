@@ -42,7 +42,7 @@ const config = {
     const resultado = await pool.query(consulta,datos)
     return resultado.rows
   }
-
+  
   export const deleteUser = async(id)=>{
     const consulta = "DELETE FROM usuarios WHERE id = $1 RETURNING *";
     const resultado = await pool.query(consulta,[id])

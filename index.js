@@ -2,8 +2,8 @@ import http from 'http';
 import fs from 'fs'
 import url from 'url'
 import { getUsers,addUser,updateUser,deleteUser } from './utils/DbConnection.js'
-import { getTransferencia, addTransferencia } from './utils/transferenciasQuerys.js'
-import moment from 'moment/moment.js';
+import { getTransferencia, addTransferencia, transferir } from './utils/transferenciasQuerys.js'
+//import moment from 'moment/moment.js';
 
 const port = 3000;
 http.createServer(async(req,res)=>{
@@ -44,7 +44,7 @@ http.createServer(async(req,res)=>{
         });
         req.on('end',async()=>{
             try {
-                const datos = Object.values(JSON.parse(body));
+                const datos = Object.values(JSON.parse(body));                
                 const respuesta = await updateUser(datos);
                 res.statusCode=201;
                 res.end(JSON).stringify(respuesta)
@@ -74,15 +74,17 @@ http.createServer(async(req,res)=>{
       res.end(JSON.stringify(resultado));
     } else if (req.url == '/transferencia' && req.method == "POST"){
       let body = '';
-      let fecha = {fecha:moment().format('DD-MM-YYYY')}
+      //let fecha = {fecha:moment().format('DD-MM-YYYY')}
       req.on('data',(chunk)=>{
           body += chunk;
         })
         req.on('end',async()=>{
             try {
-              let cuerpo = Object.assign(body,fecha)
-              const datos = Object.values(JSON.parse(cuerpo));
+              //let cuerpo = Object.assign(JSON.parse(body),fecha)
+              const datos = Object.values(JSON.parse(body));
               const respuesta = await addTransferencia(datos);
+              transferir(respuesta[0].emisor,respuesta[0].receptor,respuesta[0].monto)
+              console.log(respuesta[0].emisor,respuesta[0].receptor,respuesta[0].monto)
               res.statusCode = 201;
               res.end(JSON.stringify(respuesta));      
           } catch (error) {
